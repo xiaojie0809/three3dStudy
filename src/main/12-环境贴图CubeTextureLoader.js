@@ -1,5 +1,5 @@
 /* 
-// 目标： 网上下载的贴图文件
+// 目标： 环境贴图 CubeTextureLoader
 
 */
 
@@ -7,18 +7,6 @@ import * as THREE from "three";
 import { CubeTextureLoader } from "three";
 // 导入轨道控制器
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-/* ----------核心开始---------- */
-// 导入RGBELoader
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-// 加载hdr图
-const rgbeLoader = new RGBELoader();
-rgbeLoader.loadAsync("textures/hdr/003.hdr").then((texture) => {
-  texture.mapping = THREE.EquirectangularReflectionMapping; //纹理映射，不设置背景是张定着的图片。不会随场景转
-  scene.background = texture;
-  scene.environment = texture;
-});
-/* ----------核心end---------- */
-
 // 场景
 const scene = new THREE.Scene();
 // 相机
@@ -31,13 +19,26 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 0, 10); // 相机的位置
 scene.add(camera);
 
-const sphereGeometry = new THREE.SphereGeometry(1, 100, 100);
+/* ----------核心开始---------- */
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+const envMapTexture = cubeTextureLoader.load([
+  "textures/environmentMaps/1/px.jpg",
+  "textures/environmentMaps/1/nx.jpg",
+  "textures/environmentMaps/1/py.jpg",
+  "textures/environmentMaps/1/ny.jpg",
+  "textures/environmentMaps/1/pz.jpg",
+  "textures/environmentMaps/1/nz.jpg",
+]);
+
+const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
 const material = new THREE.MeshStandardMaterial({
+  envMap: envMapTexture,
   metalness: 0.7,
-  roughness: 0.01,
+  roughness: 0.05,
 });
 const sphere = new THREE.Mesh(sphereGeometry, material);
 scene.add(sphere);
+/* ----------核心end---------- */
 
 // 灯光
 // 环境光
